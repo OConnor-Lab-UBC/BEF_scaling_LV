@@ -5,10 +5,10 @@ library(tidyverse)
 library(minpack.lm)
 library(cowplot)
 
-meta_dyn_model_sp_pool_time<-function(disp = 0.1, spatial_env = TRUE, temporal_env = TRUE, space_gamma = 0, time_gamma = 2){
-  patches<-80
+meta_dyn_model_sp_pool_time<-function(time_gamma = 2, r = 0.3){
+  patches<-1
   species<-100
-  interval<-150
+  interval<-1000
   Tmax<-interval
   
   type= "competitive"
@@ -25,34 +25,9 @@ meta_dyn_model_sp_pool_time<-function(disp = 0.1, spatial_env = TRUE, temporal_e
   
   #environmental trait
   z<-seq(-0.2,1.2,length=species)#runif(n = species, min = -0.5,max = 1.5)
-  sig_p<-0.05 #rate of performance decay as z differs from local environment
+  sig_p<- 0.1#0.05 #rate of performance decay as z differs from local environment
   
-  n <- patches # number of points you want on the unit circle
-  landscape <- 1+(data.frame(t(sapply(1:n,function(r)c(cos(2*r*pi/n),sin(2*r*pi/n)))))+1)/2*999
-  names(landscape)<-c("x","y")
-  
-  distance_mat1<-as.matrix(dist(landscape,method = "euclidean",diag = T,upper=T))
-  
-  distance_mat<-1*(round(distance_mat1)==round(unique(c(distance_mat1))[order(unique(c(distance_mat1)))[2]]))
-  diag(distance_mat)<-0
-  connections<-distance_mat
-  
-  disp_mat <- connections*0.5
-  
-  if(spatial_env == TRUE){
-    env.df<-data.frame(env = phase.partnered(n = 80,gamma = space_gamma, mu = 0.5, sigma = 0.25)$timeseries[,1], patch = 1:patches)
-  } else {
-    env.df<-data.frame(env = 0.5, patch = 1:patches)
-  }
-  
-  if(temporal_env == TRUE){
-    temp.env<-phase.partnered(n = Tmax,gamma = time_gamma, mu = 0, sigma = 0.25)$timeseries[,1]
-  } else {
-    temp.env<-rep(0, Tmax)
-  }
-  #matplot(A, type = 'l')
-  
-  r<-0.3 #intrinsic rate of increase
+  temp.env<-phase.partnered(n = Tmax,gamma = time_gamma, mu = 0, sigma = 0.25)$timeseries[,1]
   
   bdiag1<- -.2
   if(type == "neutral"){
@@ -78,7 +53,7 @@ meta_dyn_model_sp_pool_time<-function(disp = 0.1, spatial_env = TRUE, temporal_e
   diag(B)<-bdiag1
   
   
-  Nsave<-array(NA,dim=c(patches,species,Tmax,species))
+  Nsave<-array(NA,dim=c(species,Tmax,species))
   Esave<-matrix(NA,nrow = Tmax, ncol = patches)
   
   pb <- txtProgressBar(min = 0, max = species, style = 3)
@@ -88,19 +63,20 @@ meta_dyn_model_sp_pool_time<-function(disp = 0.1, spatial_env = TRUE, temporal_e
     N[,seed.sp]<-1
     
     for(i in 1:Tmax){
-      env_t<-env.df$env+temp.env[i]
+      env_t<-temp.env[i]+0.5
       Esave[i,]<-env_t
       
       A<-t(Env_perform(env_t,z,sig_p = sig_p)*2000)
+      #if(i %in% seq(10, Tmax, by = 5)){
       N[,seed.sp]<-N[,seed.sp]+0.049
+      #}
       
       Nt<-N*exp(r+N%*%B+A)
-      Nt<-Nt+disp*disp_mat%*%Nt-Nt*disp
       
       #Nt<-Nt+rnorm(n = patches*species,mean = 0,sd=Nt*0.01)*(Nt>0)
       Nt[Nt<0.05]<-0
       N<-Nt
-      Nsave[,,i,j]<-N
+      Nsave[,i,j]<-N
     }
     setTxtProgressBar(pb, j)
   }
@@ -109,48 +85,87 @@ meta_dyn_model_sp_pool_time<-function(disp = 0.1, spatial_env = TRUE, temporal_e
 }
 
 coef.df<-data.frame()
+hold.raw.data <-data.frame()
 for(r in 1:20){
-  for(t_g in c(-1,0,2)){
+  for(t_g in c(0,1,2)){
     print(paste("rep = ",r,"; time gamma = ", t_g, sep = ""))
     
-    hold<- meta_dyn_model_sp_pool_time(disp = 0.01,spatial_env = T,temporal_env = T,space_gamma = 0,time_gamma = t_g)
+    hold<- meta_dyn_model_sp_pool_time(time_gamma = t_g)
     
     hold.data.run<-data.frame()
     coef.df_run<-data.frame()
-    for(i in 1:100){ #time window
+    for(i in 1:500){ #time window
       hold.data<-data.frame()
       for(j in 1:100){ #species pool
         if(i == 1){
-          div<-renyi(t(hold[[1]][40,,50:(i+50-1),j]),scales = 0:1,hill = TRUE)
+          div<-renyi(t(hold[[1]][,500:(i+500-1),j]),scales = 0:1,hill = TRUE)
         } else{
-          div<-renyi(colSums(t(hold[[1]][40,,50:(i+50-1),j])),scales = 0:1,hill = TRUE)}
-        bmass<-sum(hold[[1]][40,,50:(i+50-1),j])
+          div<-renyi(colSums(t(hold[[1]][,500:(i+500-1),j])),scales = 0:1,hill = TRUE)}
+        bmass<-sum(hold[[1]][,50:(i+50-1),j])
         hold.data<-bind_rows(hold.data,data.frame(SR = div[1], D = div[2],bmass = bmass, t_scale = i, sp.pool = j))
         hold.data$time_gamma<-t_g
-        hold.data$space_gamma<-space_gamma
         hold.data$rep<-r
       }
       
       hold.data.run<-bind_rows(hold.data.run, hold.data)
       
       BEF.nl<-coef(nlsLM(formula = bmass ~ (a * SR)/ (SR + b), data = hold.data,start = c(a = max(hold.data$bmass), b = max(hold.data$bmass)/2)))[2]
-      BEF.pl<-coef(lm(log(bmass)~log(SR), data = hold.data[hold.data$SR>0,]))[2]
       plot(bmass/i ~SR, data = hold.data, pch=19, main = i, xlim=c(0,70), ylim = c(0,12))
       lines(predict(nlsLM(formula = bmass/i ~ (a * SR)/ (SR + b), data = hold.data,start = c(a = max(hold.data$bmass), b = max(hold.data$bmass)/2)),newdata =data.frame(SR =1:max(hold.data$SR))), col = 2)
       abline(v = BEF.nl, col = 3)
+      hold.raw.data <- rbind(hold.raw.data, data.frame(rep = r, t_scale = i, SR = hold.data$SR, bmass = hold.data$bmass, gamma = t_g))
       
-      
-      coef.df_run<-bind_rows(coef.df_run, data.frame(BEF.nl = BEF.nl, BEF.pl = BEF.pl, t_scale = i, time_gamma = t_g, space_gamma = space_gamma, rep = r))
+      coef.df_run<-bind_rows(coef.df_run, data.frame(BEF.nl = BEF.nl, t_scale = i, time_gamma = t_g, rep = r))
     }
     coef.df_run<-left_join(coef.df_run,hold.data.run %>% 
-      group_by(sp.pool) %>% 
-      mutate(alpha_SR = min(SR)) %>% 
-      mutate(beta = SR/alpha_SR), by = c("t_scale", "time_gamma", "space_gamma", "rep"))
+                             group_by(sp.pool) %>% 
+                             mutate(alpha_SR = min(SR)) %>% 
+                             mutate(beta = SR/alpha_SR), by = c("t_scale", "time_gamma", "rep"))
     
     
     coef.df<-bind_rows(coef.df, coef.df_run)
   }
 }
+
+save(coef.df, hold.raw.data, file = "./data/LV_time.RData")
+
+hold.raw.data %>% 
+  filter(rep == 6) %>%
+  filter(t_scale %in% c(1,2,3,5,10,20,40,100,200,500)) %>% 
+  ggplot(aes(x = SR, y = bmass, color = factor(t_scale), group = t_scale))+
+  geom_point()+
+  scale_color_viridis_d()+
+  facet_wrap(~gamma)+
+  ylab("average biomass")#+
+# geom_smooth(method = "nls", formula = bmass/scale ~ a * SR / (b + SR), start = c(a = 20, b = 10))
+ggsave("./figures/temporal_raw_BEF.pdf", height = 4, width = 10)
+
+b.df <- data.frame()
+for(i in c(1,2,3,5,10,20,40,100,200,500)){
+  for(g_sel in c(0,1,2)){
+  hold.data = filter(hold.raw.data, rep == 1, gamma == g_sel, t_scale == i)
+  b.df <- rbind(b.df, data.frame(b = coef(nlsLM(formula = bmass ~ (a * SR)/ (SR + b), 
+                                                data = hold.data, 
+                                                start = c(a = max(hold.data$bmass), b = max(hold.data$bmass)/2)))[2], 
+                t_scale = i,
+                gamma = g_sel))
+}}
+
+hold.raw.data %>% 
+  filter(rep == 1) %>%
+  filter(t_scale %in% c(1,2,3,5,10,20,40,100,200,500)) %>% 
+  ggplot(aes(x = SR, y = bmass, fill = factor(t_scale), group = t_scale))+
+  scale_fill_viridis_d(end = 0.8, option = "B", name = "spatial\nscale")+
+  ylab("cumulative biomass")+
+  xlab("species richness")+
+  #geom_smooth(method = "nls", 
+  #            formula = y ~ a * x / (b + x), se = FALSE, aes(color = factor(t_scale)))+
+  geom_vline(data = b.df, aes(xintercept = b, color = factor(t_scale), fill = NULL), linetype = 2)+
+  geom_point(pch = 21, size = 2.5)+
+  facet_wrap(~gamma)+
+  scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
+  scale_linetype(guide = FALSE)
+ggsave("./figures/temporal_raw_BEF.png", height = 4*1.5, width = 10*1.5)
 
 
 means<-coef.df %>% 
@@ -158,7 +173,7 @@ means<-coef.df %>%
   summarise(lower = quantile(BEF.nl, probs = 0.25), upper = quantile(BEF.nl, probs = 0.75), BEF.nl = mean(BEF.nl))
 
 Fig.a<- means%>% 
-ggplot(aes(x=t_scale,y=BEF.nl, color = time_gamma, group = time_gamma, fill = time_gamma))+
+  ggplot(aes(x=t_scale,y=BEF.nl, color = time_gamma, group = time_gamma, fill = time_gamma))+
   geom_hline(yintercept = filter(means, t_scale == 1)$BEF.nl, color = c("dodgerblue", "grey", "red"), lty = 2)+
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, col = NA)+
   geom_line()+
@@ -180,5 +195,5 @@ Fig.b<-coef.df %>%
   xlab("temporal scale (# of time steps)")+
   ylab("temporal beta diversity")
 
-plot_grid(Fig.a, Fig.b, labels = c("a", "b"))
+plot_grid(Fig.a, Fig.b, labels = c("a)", "b)"))
 ggsave("./figures/Temporal BEF scaling.png", height = 4, width = 9)
