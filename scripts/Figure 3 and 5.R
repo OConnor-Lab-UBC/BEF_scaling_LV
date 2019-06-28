@@ -37,7 +37,7 @@ Fig3.a<-coef.df %>%
   scale_fill_gradient2(low = "dodgerblue",mid = "grey",high = "red", guide = F)+
   theme_classic()+
   xlab("spatial scale (# of local patches)")+
-  ylab("spatial beta diversity")+
+  ylab(expression(paste("spatial ", beta, " diversity", sep = "")))+
   theme(legend.justification=c(0,1), legend.position=c(0,1))+
   ylim(c(1,3.8))
 
@@ -70,7 +70,7 @@ Fig3.b<-coef.df %>%
   scale_fill_gradient2(low = "dodgerblue",mid = "grey",high = "red", guide = F)+
   theme_classic()+
   xlab("temporal scale (# of time steps)")+
-  ylab("temporal beta diversity")+
+  ylab(expression(paste("temporal ", beta, " diversity", sep = "")))+
   ylim(c(1,3.8))
 
 plot_grid(Fig3.a, Fig3.b, labels = c("a)", "b)"))
