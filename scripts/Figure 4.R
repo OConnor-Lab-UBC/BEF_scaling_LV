@@ -34,7 +34,8 @@ A <- hold.raw.data %>%
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 0")+
-  ylim(c(0,max(hold.raw.data$bmass)))
+  ylim(c(0,max(hold.raw.data$bmass)))+
+  xlim(c(0,100))
 
 B <- hold.raw.data %>% 
   filter(rep == 2, gamma == 1) %>%
@@ -50,7 +51,8 @@ B <- hold.raw.data %>%
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 1")+
-  ylim(c(0,max(hold.raw.data$bmass)))
+  ylim(c(0,max(hold.raw.data$bmass)))+
+  xlim(c(0,100))
 
 C <- hold.raw.data %>% 
   filter(rep == 2, gamma == 2) %>%
@@ -67,7 +69,8 @@ C <- hold.raw.data %>%
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 2")+
   theme(legend.justification=c(1,0), legend.position=c(1,0))+
-  ylim(c(0,max(hold.raw.data$bmass)))
+  ylim(c(0,max(hold.raw.data$bmass)))+
+  xlim(c(0,100))
 
 
 load("./data/LV_time.RData")
@@ -97,7 +100,8 @@ D <- hold.raw.data %>%
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 0")+
-  ylim(c(0,2700))
+  ylim(c(0,2700))+
+  xlim(c(0,100))
 
 E <- hold.raw.data %>% 
   filter(rep == 2, gamma == 1) %>%
@@ -113,7 +117,8 @@ E <- hold.raw.data %>%
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 1")+
-  ylim(c(0,2700))
+  ylim(c(0,2700))+
+  xlim(c(0,100))
 
 FigF <- hold.raw.data %>% 
   filter(rep == 2, gamma == 2) %>%
@@ -130,7 +135,8 @@ FigF <- hold.raw.data %>%
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 2")+
   theme(legend.justification=c(1,0), legend.position=c(1,0))+
-  ylim(c(0,2700))
+  ylim(c(0,2700))+
+  xlim(c(0,100))
 
 plot_grid(A,B,C,D,E,FigF, labels = c("a)", "b)", "c)", "d)", "e)", "f)"),nrow = 2)
 
@@ -164,7 +170,8 @@ A <- hold.raw.data %>%
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 0")+
-  ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))
+  ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))+
+  xlim(c(0,100))
 
 B <- hold.raw.data %>% 
   filter(rep == 2, gamma == 1) %>%
@@ -180,7 +187,8 @@ B <- hold.raw.data %>%
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 1")+
-  ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))
+  ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))+
+  xlim(c(0,100))
 
 C <- hold.raw.data %>% 
   filter(rep == 2, gamma == 2) %>%
@@ -197,7 +205,8 @@ C <- hold.raw.data %>%
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 2")+
   theme(legend.justification=c(1,0), legend.position=c(1,0))+
-  ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))
+  ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))+
+  xlim(c(0,100))
 
 
 load("./data/LV_time.RData")
@@ -227,7 +236,8 @@ D <- hold.raw.data %>%
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 0")+
-  ylim(c(0,5.4))
+  ylim(c(0,5.4))+
+  xlim(c(0,100))
 
 E <- hold.raw.data %>% 
   filter(rep == 2, gamma == 1) %>%
@@ -243,7 +253,8 @@ E <- hold.raw.data %>%
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 1")+
-  ylim(c(0,5.4))
+  ylim(c(0,5.4))+
+  xlim(c(0,100))
 
 FigF <- hold.raw.data %>% 
   filter(rep == 2, gamma == 2) %>%
@@ -260,7 +271,8 @@ FigF <- hold.raw.data %>%
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 2")+
   theme(legend.justification=c(1,0), legend.position=c(1,0))+
-  ylim(c(0,5.4))
+  ylim(c(0,5.4))+
+  xlim(c(0,100))
 
 plot_grid(A,B,C,D,E,FigF, labels = c("a)", "b)", "c)", "d)", "e)", "f)"),nrow = 2)
 
