@@ -99,7 +99,7 @@ meta_dyn_model_sp_pool<-function(disp = 0, type = "competitive", spatial_env = T
     for(i in 1:Tmax){
       Esave[i,]<-env.df$env
       
-      #N[,seed.sp]<-N[,seed.sp]+0.049
+      #N[,seed.sp][N[,seed.sp]==0] <- 0.049
       
       Nt<-N*exp(r+N%*%B+A)
       Nt<-Nt+disp*disp_mat%*%Nt-Nt*disp
@@ -127,7 +127,7 @@ for(r in 1:20){
     
     hold.data.run<-data.frame()
     coef.df_run<-data.frame()
-    for(k in 1:80){
+    for(k in c(1:30,32,34,36,38,40,45,50,55,60,65,70,75,80)){
       hold.data<-data.frame()
       for(j in 1:100){
         if(k == 1){
@@ -175,9 +175,9 @@ for(i in 1:4){
 A<- hold.raw.data %>% 
   filter(rep == 2, gamma == 0) %>%
   filter(scale %in% c(1,2,3,4)) %>% 
-  ggplot(aes(x = SR, y = bmass, fill = factor(scale), group = scale))+
+  ggplot(aes(x = SR, y = bmass/scale, fill = factor(scale), group = scale))+
   scale_fill_viridis_d(end = 0.8, option = "B", name = "spatial\nscale")+
-  ylab("community biomass")+
+  ylab("average biomass")+
   xlab("species richness")+
   geom_smooth(method = "nls", 
               formula = y ~ a * x / (b + x), se = FALSE, aes(color = factor(scale)))+
@@ -194,7 +194,7 @@ B<- ggplot(b.df, aes(x = scale, y = b))+
   geom_line()+
   geom_point(pch = 21, size = 4, aes(fill = factor(scale)))
 plot_grid(A, B)
-ggsave("./figures/spatial_raw_BEF_example.pdf", height = 5, width = 9)
+ggsave("./figures/spatial_raw_BEF_example.pdf", height = 4.5, width = 9)
 
 hold.raw.data %>% 
   filter(rep == 1, gamma == 0) %>%
@@ -245,7 +245,7 @@ means<-coef.df %>%
 
 Fig.a<- means%>% 
   ggplot(aes(x=scale,y=BEF.nl, color = gamma, group = gamma, fill = gamma))+
-  geom_hline(yintercept = filter(means, scale == 1)$BEF.nl, color = c("grey", "grey", "red"), lty = 2)+
+  geom_hline(yintercept = filter(means, scale == 1)$BEF.nl, color = c("grey","#ED7F64","red"), lty = 2)+
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, col = NA)+
   geom_line()+
   scale_color_gradient2(low = "dodgerblue",mid = "grey",high = "red", name = "noise")+

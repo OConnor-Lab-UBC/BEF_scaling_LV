@@ -68,7 +68,8 @@ meta_dyn_model_sp_pool_time<-function(time_gamma = 2, r = 0.3){
       
       A<-t(Env_perform(env_t,z,sig_p = sig_p)*2000)
       #if(i %in% seq(10, Tmax, by = 5)){
-      N[,seed.sp]<-N[,seed.sp]+0.049
+      #N[,seed.sp]<-N[,seed.sp]+0.049
+      N[,seed.sp][N[,seed.sp]==0] <- 0.049
       #}
       
       Nt<-N*exp(r+N%*%B+A)
@@ -94,7 +95,7 @@ for(r in 1:20){
     
     hold.data.run<-data.frame()
     coef.df_run<-data.frame()
-    for(i in 1:500){ #time window
+    for(i in c(1:20,25,30,35,40,45,50,60,70,80,90,100,150,200,250,300,350,400,450,500)){ #time window
       hold.data<-data.frame()
       for(j in 1:100){ #species pool
         if(i == 1){
@@ -110,9 +111,9 @@ for(r in 1:20){
       hold.data.run<-bind_rows(hold.data.run, hold.data)
       
       BEF.nl<-coef(nlsLM(formula = bmass ~ (a * SR)/ (SR + b), data = hold.data,start = c(a = max(hold.data$bmass), b = max(hold.data$bmass)/2)))[2]
-      plot(bmass/i ~SR, data = hold.data, pch=19, main = i, xlim=c(0,70), ylim = c(0,12))
-      lines(predict(nlsLM(formula = bmass/i ~ (a * SR)/ (SR + b), data = hold.data,start = c(a = max(hold.data$bmass), b = max(hold.data$bmass)/2)),newdata =data.frame(SR =1:max(hold.data$SR))), col = 2)
-      abline(v = BEF.nl, col = 3)
+      #plot(bmass/i ~SR, data = hold.data, pch=19, main = i, xlim=c(0,70), ylim = c(0,12))
+      #lines(predict(nlsLM(formula = bmass/i ~ (a * SR)/ (SR + b), data = hold.data,start = c(a = max(hold.data$bmass), b = max(hold.data$bmass)/2)),newdata =data.frame(SR =1:max(hold.data$SR))), col = 2)
+      #abline(v = BEF.nl, col = 3)
       hold.raw.data <- rbind(hold.raw.data, data.frame(rep = r, t_scale = i, SR = hold.data$SR, bmass = hold.data$bmass, gamma = t_g))
       
       coef.df_run<-bind_rows(coef.df_run, data.frame(BEF.nl = BEF.nl, t_scale = i, time_gamma = t_g, rep = r))
@@ -170,11 +171,11 @@ ggsave("./figures/temporal_raw_BEF.png", height = 4*1.5, width = 10*1.5)
 
 means<-coef.df %>% 
   group_by(time_gamma, t_scale) %>% 
-  summarise(lower = quantile(BEF.nl, probs = 0.25), upper = quantile(BEF.nl, probs = 0.75), BEF.nl = mean(BEF.nl))
+  summarise(lower = quantile(BEF.nl, probs = 0.25), upper = quantile(BEF.nl, probs = 0.75), BEF.nl = median(BEF.nl))
 
 Fig.a<- means%>% 
   ggplot(aes(x=t_scale,y=BEF.nl, color = time_gamma, group = time_gamma, fill = time_gamma))+
-  geom_hline(yintercept = filter(means, t_scale == 1)$BEF.nl, color = c("dodgerblue", "grey", "red"), lty = 2)+
+  geom_hline(yintercept = filter(means, t_scale == 1)$BEF.nl, color = c("grey","#ED7F64","red"), lty = 2)+
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, col = NA)+
   geom_line()+
   scale_color_gradient2(low = "dodgerblue",mid = "grey",high = "red", name = "noise")+
