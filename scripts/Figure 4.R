@@ -155,7 +155,7 @@ A <- hold.raw.data %>%
   filter(scale %in% c(1,2,3,5,10,20,30,40,60,80)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
-  ylab("average biomass")+
+  ylab("cumulative biomass/scale")+
   xlab("species richness")+
   geom_vline(data = filter(b.df, gamma == 0), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
@@ -171,7 +171,7 @@ B <- hold.raw.data %>%
   filter(scale %in% c(1,2,3,5,10,20,30,40,60,80)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
-  ylab("average biomass")+
+  ylab("cumulative biomass/scale")+
   xlab("species richness")+
   geom_vline(data = filter(b.df, gamma == 1), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
@@ -187,7 +187,7 @@ C <- hold.raw.data %>%
   filter(scale %in% c(1,2,3,5,10,20,30,40,60,80)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "spatial\nscale", trans = "log10")+
-  ylab("average biomass")+
+  ylab("cumulative biomass/scale")+
   xlab("species richness")+
   geom_vline(data = filter(b.df, gamma == 2), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
@@ -218,7 +218,7 @@ D <- hold.raw.data %>%
   filter(t_scale %in% c(1,2,3,5,10,20,40,100,200,500)) %>% 
   ggplot(aes(x = SR, y = bmass/t_scale, fill = t_scale, group = t_scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
-  ylab("average biomass")+
+  ylab("cumulative biomass/scale")+
   xlab("species richness")+
   geom_vline(data = filter(b.df, gamma == 0), aes(xintercept = b, color = factor(t_scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
@@ -234,7 +234,7 @@ E <- hold.raw.data %>%
   filter(t_scale %in% c(1,2,3,5,10,20,40,100,200,500)) %>% 
   ggplot(aes(x = SR, y = bmass/t_scale, fill = t_scale, group = t_scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
-  ylab("average biomass")+
+  ylab("cumulative biomass/scale")+
   xlab("species richness")+
   geom_vline(data = filter(b.df, gamma == 1), aes(xintercept = b, color = factor(t_scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
@@ -250,7 +250,7 @@ FigF <- hold.raw.data %>%
   filter(t_scale %in% c(1,2,3,5,10,20,40,100,200,500)) %>% 
   ggplot(aes(x = SR, y = bmass/t_scale, fill = t_scale, group = t_scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", trans = "log10")+
-  ylab("average biomass")+
+  ylab("cumulative biomass/scale")+
   xlab("species richness")+
   geom_vline(data = filter(b.df, gamma == 2), aes(xintercept = b, color = factor(t_scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+

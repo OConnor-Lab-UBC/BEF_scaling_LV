@@ -23,7 +23,7 @@ Fig5.a<- means%>%
   scale_fill_gradient2(low = "dodgerblue",mid = "grey",high = "red", guide = F)+
   theme_classic()+
   xlab("spatial scale (# of local patches)")+
-  ylab("BEF half saturation richness")+
+  ylab(expression(paste("BEF half saturation richness (", italic(b[i]),")"), sep = ""))+
   theme(legend.justification=c(1,1), legend.position=c(1,1))+
   coord_cartesian(ylim = c(3,68))
 
@@ -56,7 +56,7 @@ Fig5.b<- means%>%
   scale_fill_gradient2(low = "dodgerblue",mid = "grey",high = "red", guide = F)+
   theme_classic()+
   xlab("temporal scale (# of time steps)")+
-  ylab("BEF half saturation richness")+
+  ylab(expression(paste("BEF half saturation richness (", italic(b[i]),")"), sep = ""))+
   coord_cartesian(ylim = c(3,68))
 
 
