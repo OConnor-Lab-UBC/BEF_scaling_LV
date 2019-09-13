@@ -139,7 +139,9 @@ for(r in 1:20){
         hold.data$gamma<-gamma
         hold.data$rep<-r
       }
-      BEF.nl<-coef(nlsLM(formula = bmass ~ (a * SR)/ (SR + b), data = hold.data,start = c(a = max(hold.data$bmass), b = max(hold.data$bmass)/2)))[2]
+      coef.hold <- coef(nlsLM(formula = bmass ~ (a * SR)/ (SR + b), data = hold.data,start = c(a = max(hold.data$bmass), b = max(hold.data$bmass)/2)))
+      BEF.nl<-coef.hold[2]
+      BEF.nl_max<-coef.hold[1]
       BEF.pl<-coef(lm(log(bmass)~log(SR), data = hold.data[hold.data$SR>0,]))[2]
       #plot(bmass/k ~SR, data = hold.data, pch=19, main = k, xlim=c(0,100), ylim = c(0,12))
       hold.raw.data <- rbind(hold.raw.data, data.frame(rep = r, scale = k, SR = hold.data$SR, bmass = hold.data$bmass, gamma = gamma))
@@ -147,7 +149,7 @@ for(r in 1:20){
       #abline(v = BEF.nl, col = 3)
       
       
-      coef.df_run<-bind_rows(coef.df_run, data.frame(BEF.nl = BEF.nl, BEF.pl = BEF.pl, scale = k, gamma = gamma, rep = r))
+      coef.df_run<-bind_rows(coef.df_run, data.frame(BEF.nl = BEF.nl, BEF.pl = BEF.pl, BEF.nl_max = BEF.nl_max,scale = k, gamma = gamma, rep = r))
       all.data.df<-bind_rows(all.data.df,hold.data)
       hold.data.run<-bind_rows(hold.data.run, hold.data)
     }
@@ -268,3 +270,17 @@ Fig.b<-coef.df %>%
 
 plot_grid(Fig.a, Fig.b, labels = c("a)", "b)"))
 ggsave("./figures/Spatial BEF scaling.png", height = 4, width = 9)
+
+means2<-coef.df %>% 
+  group_by(gamma, scale) %>% 
+  summarise(lower = quantile(BEF.nl_max, probs = 0.25), upper = quantile(BEF.nl_max, probs = 0.75), BEF.nl_max = median(BEF.nl_max))
+
+Fig.a<- means2%>% 
+  ggplot(aes(x=scale,y=BEF.nl_max/scale, color = gamma, group = gamma, fill = gamma))+
+  geom_ribbon(aes(ymin = lower/scale, ymax = upper/scale), alpha = 0.2, col = NA)+
+  geom_line()+
+  scale_color_gradient2(low = "dodgerblue",mid = "grey",high = "red", name = "noise")+
+  scale_fill_gradient2(low = "dodgerblue",mid = "grey",high = "red", guide = F)+
+  theme_classic()+
+  xlab("spatial scale (# of local patches)")+
+  ylab("EF saturation level")

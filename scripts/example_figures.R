@@ -45,15 +45,19 @@ ggsave("./figures/env_space_all.pdf", height = 4, width = 5)
 
 hold<-meta_dyn_model_sp_pool(spatial_env = TRUE, env_gamma = 2, disp = 0)
 
+env<-(decostand(c(hold[[2]][1,],-0.2,1.2),method = "range")[1:80])*100
+
 comp_C <- data.frame(N = c(hold[[1]][,,100]), species = rep(1:100, each = 80), patch = 1:80) %>%
   filter(N >0) %>% 
   ggplot(aes(x = patch, y = species, size = N))+
   geom_point()+
   ylab("species ID")+
   scale_size_continuous(range = c(0.1,1),guide = F)+
+  geom_line(data = data.frame(species = env, patch = 1:80), aes(size = NULL),color = "red", size = 1, alpha = 0.4)+
   ggtitle("gamma = 2")
 
 hold2<-meta_dyn_model_sp_pool(spatial_env = TRUE, env_gamma = 1, disp = 0)
+env<-(decostand(c(hold2[[2]][1,],-0.2,1.2),method = "range")[1:80])*100
 
 comp_B <- data.frame(N = c(hold2[[1]][,,100]), species = rep(1:100, each = 80), patch = 1:80) %>%
   filter(N >0) %>% 
@@ -61,9 +65,11 @@ comp_B <- data.frame(N = c(hold2[[1]][,,100]), species = rep(1:100, each = 80), 
   geom_point()+
   ylab("species ID")+
   scale_size_continuous(range = c(0.1,1),guide = F)+
+  geom_line(data = data.frame(species = env, patch = 1:80), aes(size = NULL),color = "red", size = 1, alpha = 0.4)+
   ggtitle("gamma = 1")
 
 hold3<-meta_dyn_model_sp_pool(spatial_env = TRUE, env_gamma = 0, disp = 0)
+env<-(decostand(c(hold3[[2]][1,],-0.2,1.2),method = "range")[1:80])*100
 
 comp_A <- data.frame(N = c(hold3[[1]][,,100]), species = rep(1:100, each = 80), patch = 1:80) %>%
   filter(N >0) %>% 
@@ -71,9 +77,11 @@ comp_A <- data.frame(N = c(hold3[[1]][,,100]), species = rep(1:100, each = 80), 
   geom_point()+
   ylab("species ID")+
   scale_size_continuous(range = c(0.1,1), guide = F)+
+  geom_line(data = data.frame(species = env, patch = 1:80), aes(size = NULL),color = "red", size = 1, alpha = 0.4)+
   ggtitle("gamma = 0")
 
 hold4<- meta_dyn_model_sp_pool_time(time_gamma = 0)
+env<-(decostand(c(hold4[[2]],-0.2,1.2),method = "range")[501:1000])*100
 
 comp_D <- data.frame(N = c(t(hold4[[1]][,501:1000,100])), species = rep(1:100, each = 500), time = 1:500) %>%
   filter(N >0) %>% 
@@ -81,9 +89,11 @@ comp_D <- data.frame(N = c(t(hold4[[1]][,501:1000,100])), species = rep(1:100, e
   geom_point()+
   ylab("species ID")+
   scale_size_continuous(range = c(0.1,1), guide = F)+
+  geom_line(data = data.frame(species = env, time = 1:500), aes(size = NULL),color = "red", alpha = 0.4)+
   ggtitle("gamma = 0")
 
 hold5<- meta_dyn_model_sp_pool_time(time_gamma = 1)
+env<-(decostand(c(hold5[[2]],-0.2,1.2),method = "range")[501:1000])*100
 
 comp_E <- data.frame(N = c(t(hold5[[1]][,501:1000,100])), species = rep(1:100, each = 500), time = 1:500) %>%
   filter(N >0) %>%  
@@ -91,9 +101,11 @@ comp_E <- data.frame(N = c(t(hold5[[1]][,501:1000,100])), species = rep(1:100, e
   geom_point()+
   ylab("species ID")+
   scale_size_continuous(range = c(0.1,1), guide = F)+
+  geom_line(data = data.frame(species = env, time = 1:500), aes(size = NULL),color = "red", alpha = 0.4)+
   ggtitle("gamma = 1")
 
 hold6<- meta_dyn_model_sp_pool_time(time_gamma = 2)
+env<-(decostand(c(hold6[[2]],-0.2,1.2),method = "range")[501:1000])*100
 
 comp_F <- data.frame(N = c(t(hold6[[1]][,501:1000,100])), species = rep(1:100, each = 500), time = 1:500) %>%
   filter(N >0) %>% 
@@ -101,6 +113,7 @@ comp_F <- data.frame(N = c(t(hold6[[1]][,501:1000,100])), species = rep(1:100, e
   geom_point()+
   ylab("species ID")+
   scale_size_continuous(range = c(0.1,1), guide = F)+
+  geom_line(data = data.frame(species = env, time = 1:500), aes(size = NULL),color = "red", alpha = 0.4)+
   ggtitle("gamma = 2")
 
 
