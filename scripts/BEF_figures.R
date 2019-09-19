@@ -133,8 +133,8 @@ for(r in 21:reps){
     }
   }
 }
-
-
+#save(hold.raw.data, coef.df, file ="./data/BEF_scale_simulation_date.RData")
+load("./data/BEF_scale_simulation_date.RData")
 
 #Figure 3####
 beta.df <- hold.raw.data %>% 
@@ -152,7 +152,7 @@ Fig.3a<- beta.df %>%
   ggplot(aes(x=scale,y=beta, color = factor(gamma), group = gamma, fill = factor(gamma)))+
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, col = NA)+
   geom_line(size = 1)+
-  scale_color_manual(values = colV, name = expression(paste("environmental ", gamma, sep = "")))+
+  scale_color_manual(values = colV, name = expression(paste("env. ", gamma, sep = "")))+
   scale_fill_manual(values = colV, guide = F)+
   theme_classic()+
   xlab("spatial scale (# of local patches)")+
@@ -306,7 +306,7 @@ Fig.5a <- sum.coef %>%
   geom_hline(yintercept = filter(sum.coef, scale == 1, scenario == "space")$b, color = colV, lty = 2)+
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, col = NA)+
   geom_line()+
-  scale_color_manual(values = colV, name = expression(paste("environmental ", gamma, sep = "")))+
+  scale_color_manual(values = colV, name = expression(paste("env. ", gamma, sep = "")))+
   scale_fill_manual(values = colV, guide = F)+
   theme_classic()+
   xlab("temporal scale (# of patches)")+
