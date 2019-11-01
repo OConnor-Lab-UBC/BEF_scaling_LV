@@ -240,27 +240,37 @@ plot_grid(Fig.3a, Fig.3b, Fig.3c, Fig.3d,labels = "AUTO")
 ggsave("./figures/Fig.3.png", height = 8, width = 9) 
 
 #Figure 4####
-b.df <- data.frame()
-for(i in c(1,2,3,5,10,20,30,40,60,80)){
-  for(g_sel in c(0,1,2)){
-    for(scenario in c("space", "time")){
-    hold.data = filter(hold.raw.data, rep == 2, gamma == g_sel, scale == i, scenario == scenario)
-    b.df <- rbind(b.df, data.frame(b = coef(nlsLM(formula = bmass ~ (a * SR)/ (SR + b), 
-                                                  data = hold.data, 
-                                                  start = c(a = max(hold.data$bmass), b = max(hold.data$bmass)/2)))[2], 
-                                   scale = i,
-                                   gamma = g_sel,
-                                   scenario = scenario))
-  }}}
+# b.df <- data.frame()
+# for(i in c(1,2,3,5,10,20,30,40,60,80)){
+#   for(g_sel in c(0,1,2)){
+#     for(sc in c("space", "time")){
+#     hold.data <- filter(hold.raw.data, gamma == g_sel, scale == i, scenario == sc) %>% 
+#       group_by(sp.pool, scenario) %>% 
+#       summarise(bmass = median(bmass), SR = median(SR))
+#     
+#     b.df <- rbind(b.df, data.frame(b = coef(nlsLM(formula = bmass ~ (a * SR)/ (SR + b), 
+#                                                   data = hold.data, 
+#                                                   start = c(a = max(hold.data$bmass), b = max(hold.data$bmass)/2)))[2], 
+#                                    scale = i,
+#                                    gamma = g_sel,
+#                                    scenario = sc))
+#     }}}
+
+sum.coef <- coef.df %>% 
+  group_by(scenario, scale, gamma) %>% 
+  summarise(lower = quantile(b, probs = 0.25), upper = quantile(b, probs = 0.75), b = median(b)) %>% 
+  filter(scale %in% c(1,2,3,5,10,20,30,40,60,80))
 
 Fig.4a <- hold.raw.data %>%
-  filter(rep == 2, gamma == 0, scenario == "space") %>%
+  filter(gamma == 0, scenario == "space") %>%
   filter(scale %in% c(1,2,3,5,10,20,30,40,60,80)) %>% 
+  group_by(scale, sp.pool) %>% 
+  summarise(SR = median(SR), bmass = median(bmass)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
-  scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
+  scale_fill_viridis_c(end = 0.8, option = "B", name = "scale", trans = "log10", breaks = c(1,3,10,30,80))+
   ylab("cumulative biomass/scale")+
   xlab("species richness")+
-  geom_vline(data = filter(b.df, gamma == 0, scenario=="space"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
+  geom_vline(data = filter(sum.coef, gamma == 0, scenario=="space"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
   geom_smooth(method = "nls", 
               formula = y ~ a * x / (b + x), se = FALSE, aes(color = factor(scale)))+
@@ -268,16 +278,19 @@ Fig.4a <- hold.raw.data %>%
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 0")+
   ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))+
-  xlim(c(0,100))
+  xlim(c(0,100))+
+  theme(legend.justification=c(1,0), legend.position=c(1,0.001))
 
 Fig.4b <- hold.raw.data %>%
-  filter(rep == 2, gamma == 1, scenario == "space") %>%
+  filter(gamma == 1, scenario == "space") %>%
   filter(scale %in% c(1,2,3,5,10,20,30,40,60,80)) %>% 
+  group_by(scale, sp.pool) %>% 
+  summarise(SR = median(SR), bmass = median(bmass)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
   ylab("cumulative biomass/scale")+
   xlab("species richness")+
-  geom_vline(data = filter(b.df, gamma == 1, scenario=="space"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
+  geom_vline(data = filter(sum.coef, gamma == 1, scenario=="space"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
   geom_smooth(method = "nls", 
               formula = y ~ a * x / (b + x), se = FALSE, aes(color = factor(scale)))+
@@ -288,13 +301,15 @@ Fig.4b <- hold.raw.data %>%
   xlim(c(0,100))
 
 Fig.4c <- hold.raw.data %>%
-  filter(rep == 2, gamma == 2, scenario == "space") %>%
+  filter(gamma == 2, scenario == "space") %>%
   filter(scale %in% c(1,2,3,5,10,20,30,40,60,80)) %>% 
+  group_by(scale, sp.pool) %>% 
+  summarise(SR = median(SR), bmass = median(bmass)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
   ylab("cumulative biomass/scale")+
   xlab("species richness")+
-  geom_vline(data = filter(b.df, gamma == 2, scenario=="space"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
+  geom_vline(data = filter(sum.coef, gamma == 2, scenario=="space"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
   geom_smooth(method = "nls", 
               formula = y ~ a * x / (b + x), se = FALSE, aes(color = factor(scale)))+
@@ -305,13 +320,15 @@ Fig.4c <- hold.raw.data %>%
   xlim(c(0,100))
 
 Fig.4d <- hold.raw.data %>%
-  filter(rep == 7, gamma == 0, scenario == "time") %>%
+  filter(gamma == 0, scenario == "time") %>%
   filter(scale %in% c(1,2,3,5,10,20,30,40,60,80)) %>% 
+  group_by(scale, sp.pool) %>% 
+  summarise(SR = median(SR), bmass = median(bmass)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
   ylab("cumulative biomass/scale")+
   xlab("species richness")+
-  geom_vline(data = filter(b.df, gamma == 0, scenario=="time"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
+  geom_vline(data = filter(sum.coef, gamma == 0, scenario=="time"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
   geom_smooth(method = "nls", 
               formula = y ~ a * x / (b + x), se = FALSE, aes(color = factor(scale)))+
@@ -322,13 +339,15 @@ Fig.4d <- hold.raw.data %>%
   xlim(c(0,100))
 
 Fig.4e <- hold.raw.data %>%
-  filter(rep == 1, gamma == 1, scenario == "time") %>%
+  filter(gamma == 1, scenario == "time") %>%
   filter(scale %in% c(1,2,3,5,10,20,30,40,60,80)) %>% 
+  group_by(scale, sp.pool) %>% 
+  summarise(SR = median(SR), bmass = median(bmass)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
   ylab("cumulative biomass/scale")+
   xlab("species richness")+
-  geom_vline(data = filter(b.df, gamma == 1, scenario=="time"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
+  geom_vline(data = filter(sum.coef, gamma == 1, scenario=="time"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
   geom_smooth(method = "nls", 
               formula = y ~ a * x / (b + x), se = FALSE, aes(color = factor(scale)))+
@@ -339,13 +358,15 @@ Fig.4e <- hold.raw.data %>%
   xlim(c(0,100))
 
 Fig.4f <- hold.raw.data %>%
-  filter(rep == 2, gamma == 2, scenario == "time") %>%
+  filter(gamma == 2, scenario == "time") %>%
   filter(scale %in% c(1,2,3,5,10,20,30,40,60,80)) %>% 
+  group_by(scale, sp.pool) %>% 
+  summarise(SR = median(SR), bmass = median(bmass)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
   ylab("cumulative biomass/scale")+
   xlab("species richness")+
-  geom_vline(data = filter(b.df, gamma == 2, scenario=="time"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
+  geom_vline(data = filter(sum.coef, gamma == 2, scenario=="time"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
   geom_smooth(method = "nls", 
               formula = y ~ a * x / (b + x), se = FALSE, aes(color = factor(scale)))+
@@ -356,7 +377,7 @@ Fig.4f <- hold.raw.data %>%
   xlim(c(0,100))
 
 plot_grid(Fig.4a, Fig.4b, Fig.4c, Fig.4d, Fig.4e, Fig.4f, labels = "AUTO",nrow = 2)
-ggsave("./figures/Fig.4.png", height = 10, width = 16)
+ggsave("./figures/Fig.4.png", height = 10*0.8, width = 16*0.8)
 
 #Figure 5####
 sum.coef <- coef.df %>% 
