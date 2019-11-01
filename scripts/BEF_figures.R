@@ -137,44 +137,107 @@ for(r in 21:reps){
 load("./data/BEF_scale_simulation_date.RData")
 
 #Figure 3####
-beta.df <- hold.raw.data %>% 
+diversity.df <- hold.raw.data %>% 
   filter(sp.pool == 100) %>% 
-  group_by(rep, scenario, gamma) %>% 
-  mutate(SR_alpha = first(SR)) %>% 
-  group_by(rep, scenario, gamma, scale) %>% 
-  mutate(beta = SR/SR_alpha) %>% 
-  ungroup() %>%
   group_by(scenario, gamma, scale) %>% 
-  summarise(lower = quantile(beta, probs = 0.25), upper = quantile(beta, probs = 0.75), beta = median(beta))
+  summarise(lower = quantile(SR, probs = 0.25), upper = quantile(SR, probs = 0.75), richness = median(SR))
 
-Fig.3a<- beta.df %>% 
+
+Fig.3a<- diversity.df %>% 
   filter(scenario == "space") %>% 
-  ggplot(aes(x=scale,y=beta, color = factor(gamma), group = gamma, fill = factor(gamma)))+
+  ggplot(aes(x=scale,y=richness, color = factor(gamma), group = gamma, fill = factor(gamma)))+
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, col = NA)+
   geom_line(size = 1)+
   scale_color_manual(values = colV, name = expression(paste("env. ", gamma, sep = "")))+
   scale_fill_manual(values = colV, guide = F)+
   theme_classic()+
   xlab("spatial scale (# of local patches)")+
-  ylab(expression(paste("spatial ", beta, "-diversity", sep = "")))+
+  ylab("species richness")+
   theme(legend.justification=c(1,0), legend.position=c(1,0.001))+
-coord_cartesian(ylim = c(beta.df$lower, beta.df$upper))
+  coord_cartesian(ylim = c(diversity.df$lower, diversity.df$upper))
 
-Fig.3b<- beta.df %>% 
+Fig.3b<- diversity.df %>% 
   filter(scenario == "time") %>% 
-  ggplot(aes(x=scale,y=beta, color = factor(gamma), group = gamma, fill = factor(gamma)))+
+  ggplot(aes(x=scale,y= richness, color = factor(gamma), group = gamma, fill = factor(gamma)))+
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, col = NA)+
   geom_line(size = 1)+
-  scale_color_manual(values = colV, name = "gamma", guide = F)+
+  scale_color_manual(values = colV, name = expression(paste("env. ", gamma, sep = "")), guide = F)+
   scale_fill_manual(values = colV, guide = F)+
   theme_classic()+
   xlab("temporal scale (# of time steps)")+
-  ylab(expression(paste("temporal ", beta, "-diversity", sep = "")))+
-  theme(legend.justification=c(1,0), legend.position=c(1,0.01))+
-  coord_cartesian(ylim = c(beta.df$lower, beta.df$upper))
+  ylab("species richness")+
+  coord_cartesian(ylim = c(diversity.df$lower, diversity.df$upper))
 
-plot_grid(Fig.3a, Fig.3b, labels = "AUTO")
-ggsave("./figures/Fig.3.png", height = 4, width = 9) 
+biomass.df <- hold.raw.data %>% 
+  filter(sp.pool == 100) %>% 
+  group_by(scenario, gamma, scale) %>% 
+  summarise(lower = quantile(bmass/scale, probs = 0.25), upper = quantile(bmass/scale, probs = 0.75), bmass = median(bmass/scale))
+
+Fig.3c<- biomass.df %>% 
+  filter(scenario == "space") %>% 
+  ggplot(aes(x=scale,y=bmass, color = factor(gamma), group = gamma, fill = factor(gamma)))+
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, col = NA)+
+  geom_line(size = 1)+
+  scale_color_manual(values = colV, name = expression(paste("env. ", gamma, sep = "")), guide = F)+
+  scale_fill_manual(values = colV, guide = F)+
+  theme_classic()+
+  xlab("spatial scale (# of local patches)")+
+  ylab("cumulative biomass/scale")+
+  theme(legend.justification=c(1,0), legend.position=c(1,0.001))+
+  coord_cartesian(ylim = c(biomass.df$lower, biomass.df$upper))
+
+Fig.3d<- biomass.df %>% 
+  filter(scenario == "time") %>% 
+  ggplot(aes(x=scale,y= bmass, color = factor(gamma), group = gamma, fill = factor(gamma)))+
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, col = NA)+
+  geom_line(size = 1)+
+  scale_color_manual(values = colV, name = expression(paste("env. ", gamma, sep = "")), guide = F)+
+  scale_fill_manual(values = colV, guide = F)+
+  theme_classic()+
+  xlab("temporal scale (# of time steps)")+
+  ylab("cumulative biomass/scale")+
+  theme(legend.justification=c(1,0), legend.position=c(1,0.001))+
+  coord_cartesian(ylim = c(biomass.df$lower, biomass.df$upper))
+
+
+# beta.df <- hold.raw.data %>% 
+#   filter(sp.pool == 100) %>% 
+#   group_by(rep, scenario, gamma) %>% 
+#   mutate(SR_alpha = first(SR)) %>% 
+#   group_by(rep, scenario, gamma, scale) %>% 
+#   mutate(beta = SR/SR_alpha) %>% 
+#   ungroup() %>%
+#   group_by(scenario, gamma, scale) %>% 
+#   summarise(lower = quantile(beta, probs = 0.25), upper = quantile(beta, probs = 0.75), beta = median(beta))
+# 
+# Fig.3a<- beta.df %>% 
+#   filter(scenario == "space") %>% 
+#   ggplot(aes(x=scale,y=beta, color = factor(gamma), group = gamma, fill = factor(gamma)))+
+#   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, col = NA)+
+#   geom_line(size = 1)+
+#   scale_color_manual(values = colV, name = expression(paste("env. ", gamma, sep = "")))+
+#   scale_fill_manual(values = colV, guide = F)+
+#   theme_classic()+
+#   xlab("spatial scale (# of local patches)")+
+#   ylab(expression(paste("spatial ", beta, "-diversity", sep = "")))+
+#   theme(legend.justification=c(1,0), legend.position=c(1,0.001))+
+# coord_cartesian(ylim = c(beta.df$lower, beta.df$upper))
+# 
+# Fig.3b<- beta.df %>% 
+#   filter(scenario == "time") %>% 
+#   ggplot(aes(x=scale,y=beta, color = factor(gamma), group = gamma, fill = factor(gamma)))+
+#   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, col = NA)+
+#   geom_line(size = 1)+
+#   scale_color_manual(values = colV, name = "gamma", guide = F)+
+#   scale_fill_manual(values = colV, guide = F)+
+#   theme_classic()+
+#   xlab("temporal scale (# of time steps)")+
+#   ylab(expression(paste("temporal ", beta, "-diversity", sep = "")))+
+#   theme(legend.justification=c(1,0), legend.position=c(1,0.01))+
+#   coord_cartesian(ylim = c(beta.df$lower, beta.df$upper))
+
+plot_grid(Fig.3a, Fig.3b, Fig.3c, Fig.3d,labels = "AUTO")
+ggsave("./figures/Fig.3.png", height = 8, width = 9) 
 
 #Figure 4####
 b.df <- data.frame()
