@@ -393,7 +393,7 @@ Fig.5a <- sum.coef %>%
   scale_color_manual(values = colV, name = expression(paste("env. ", gamma, sep = "")))+
   scale_fill_manual(values = colV, guide = F)+
   theme_classic()+
-  xlab("temporal scale (# of patches)")+
+  xlab("spatial scale (# of patches)")+
   ylab(expression(paste("BEF half saturation richness (", italic(b[i]),")"), sep = ""))+
   coord_cartesian(ylim = c(sum.coef$lower, sum.coef$upper))+
   theme(legend.justification=c(1,0), legend.position=c(1,0.001))
