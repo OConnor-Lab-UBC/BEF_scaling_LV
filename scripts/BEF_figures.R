@@ -154,7 +154,7 @@ Fig.3a<- diversity.df %>%
   xlab("spatial scale (# of local patches)")+
   ylab("species richness")+
   theme(legend.justification=c(1,0), legend.position=c(1,0.001))+
-  coord_cartesian(ylim = c(diversity.df$lower, diversity.df$upper))
+  coord_cartesian(ylim = c(min(diversity.df$lower), max(diversity.df$upper)))
 
 Fig.3b<- diversity.df %>% 
   filter(scenario == "time") %>% 
@@ -166,7 +166,7 @@ Fig.3b<- diversity.df %>%
   theme_classic()+
   xlab("temporal scale (# of time steps)")+
   ylab("species richness")+
-  coord_cartesian(ylim = c(diversity.df$lower, diversity.df$upper))
+  coord_cartesian(ylim = c(min(diversity.df$lower), max(diversity.df$upper)))
 
 biomass.df <- hold.raw.data %>% 
   filter(sp.pool == 100) %>% 
@@ -182,9 +182,9 @@ Fig.3c<- biomass.df %>%
   scale_fill_manual(values = colV, guide = F)+
   theme_classic()+
   xlab("spatial scale (# of local patches)")+
-  ylab("cumulative biomass/scale")+
+  ylab("average biomass per patch")+
   theme(legend.justification=c(1,0), legend.position=c(1,0.001))+
-  coord_cartesian(ylim = c(biomass.df$lower, biomass.df$upper))
+  coord_cartesian(ylim = c(min(biomass.df$lower), max(biomass.df$upper)))
 
 Fig.3d<- biomass.df %>% 
   filter(scenario == "time") %>% 
@@ -195,9 +195,9 @@ Fig.3d<- biomass.df %>%
   scale_fill_manual(values = colV, guide = F)+
   theme_classic()+
   xlab("temporal scale (# of time steps)")+
-  ylab("cumulative biomass/scale")+
+  ylab("average biomass per time step")+
   theme(legend.justification=c(1,0), legend.position=c(1,0.001))+
-  coord_cartesian(ylim = c(biomass.df$lower, biomass.df$upper))
+  coord_cartesian(ylim = c(min(biomass.df$lower), max(biomass.df$upper)))
 
 
 # beta.df <- hold.raw.data %>% 
@@ -268,7 +268,7 @@ Fig.4a <- hold.raw.data %>%
   summarise(SR = median(SR), bmass = median(bmass)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "scale", trans = "log10", breaks = c(1,3,10,30,80))+
-  ylab("cumulative biomass/scale")+
+  ylab("median biomass per patch")+
   xlab("species richness")+
   geom_vline(data = filter(sum.coef, gamma == 0, scenario=="space"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
@@ -277,6 +277,7 @@ Fig.4a <- hold.raw.data %>%
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 0")+
+  theme_classic()+
   ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))+
   xlim(c(0,100))+
   theme(legend.justification=c(1,0), legend.position=c(1,0.001))
@@ -288,7 +289,7 @@ Fig.4b <- hold.raw.data %>%
   summarise(SR = median(SR), bmass = median(bmass)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
-  ylab("cumulative biomass/scale")+
+  ylab("median biomass per patch")+
   xlab("species richness")+
   geom_vline(data = filter(sum.coef, gamma == 1, scenario=="space"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
@@ -297,6 +298,7 @@ Fig.4b <- hold.raw.data %>%
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 1")+
+  theme_classic()+
   ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))+
   xlim(c(0,100))
 
@@ -307,7 +309,7 @@ Fig.4c <- hold.raw.data %>%
   summarise(SR = median(SR), bmass = median(bmass)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
-  ylab("cumulative biomass/scale")+
+  ylab("median biomass per patch")+
   xlab("species richness")+
   geom_vline(data = filter(sum.coef, gamma == 2, scenario=="space"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
@@ -316,6 +318,7 @@ Fig.4c <- hold.raw.data %>%
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
   ggtitle("gamma = 2")+
+  theme_classic()+
   ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))+
   xlim(c(0,100))
 
@@ -326,7 +329,7 @@ Fig.4d <- hold.raw.data %>%
   summarise(SR = median(SR), bmass = median(bmass)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
-  ylab("cumulative biomass/scale")+
+  ylab("median biomass per time step")+
   xlab("species richness")+
   geom_vline(data = filter(sum.coef, gamma == 0, scenario=="time"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
@@ -334,6 +337,7 @@ Fig.4d <- hold.raw.data %>%
               formula = y ~ a * x / (b + x), se = FALSE, aes(color = factor(scale)))+
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
+  theme_classic()+
   ggtitle("gamma = 0")+
   ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))+
   xlim(c(0,100))
@@ -345,7 +349,7 @@ Fig.4e <- hold.raw.data %>%
   summarise(SR = median(SR), bmass = median(bmass)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
-  ylab("cumulative biomass/scale")+
+  ylab("median biomass per time step")+
   xlab("species richness")+
   geom_vline(data = filter(sum.coef, gamma == 1, scenario=="time"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
@@ -353,6 +357,7 @@ Fig.4e <- hold.raw.data %>%
               formula = y ~ a * x / (b + x), se = FALSE, aes(color = factor(scale)))+
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
+  theme_classic()+
   ggtitle("gamma = 1")+
   ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))+
   xlim(c(0,100))
@@ -364,7 +369,7 @@ Fig.4f <- hold.raw.data %>%
   summarise(SR = median(SR), bmass = median(bmass)) %>% 
   ggplot(aes(x = SR, y = bmass/scale, fill = scale, group = scale))+
   scale_fill_viridis_c(end = 0.8, option = "B", name = "temporal\nscale", guide = FALSE, trans = "log10")+
-  ylab("cumulative biomass/scale")+
+  ylab("median biomass per time step")+
   xlab("species richness")+
   geom_vline(data = filter(sum.coef, gamma == 2, scenario=="time"), aes(xintercept = b, color = factor(scale), fill = NULL), linetype = 2)+
   geom_point(pch = 21, size = 2.5)+
@@ -372,12 +377,13 @@ Fig.4f <- hold.raw.data %>%
               formula = y ~ a * x / (b + x), se = FALSE, aes(color = factor(scale)))+
   scale_color_viridis_d(end = 0.8, option = "B", guide = FALSE)+
   scale_linetype(guide = FALSE)+
+  theme_classic()+
   ggtitle("gamma = 2")+
   ylim(c(0,max(hold.raw.data$bmass)/max(hold.raw.data$scale)))+
   xlim(c(0,100))
 
 plot_grid(Fig.4a, Fig.4b, Fig.4c, Fig.4d, Fig.4e, Fig.4f, labels = "AUTO",nrow = 2)
-ggsave("./figures/Fig.4.png", height = 10*0.8, width = 16*0.8)
+ggsave("./figures/Fig.4.png", height = 10*0.7, width = 16*0.7)
 
 #Figure 5####
 sum.coef <- coef.df %>% 
@@ -395,7 +401,7 @@ Fig.5a <- sum.coef %>%
   theme_classic()+
   xlab("spatial scale (# of patches)")+
   ylab(expression(paste("BEF half saturation richness (", italic(b[i]),")"), sep = ""))+
-  coord_cartesian(ylim = c(sum.coef$lower, sum.coef$upper))+
+  coord_cartesian(ylim = c(min(sum.coef$lower), max(sum.coef$upper)))+
   theme(legend.justification=c(1,0), legend.position=c(1,0.001))
 
 Fig.5b <- sum.coef %>%
@@ -409,7 +415,7 @@ Fig.5b <- sum.coef %>%
   theme_classic()+
   xlab("temporal scale (# of time steps)")+
   ylab(expression(paste("BEF half saturation richness (", italic(b[i]),")"), sep = ""))+
-  coord_cartesian(ylim = c(sum.coef$lower, sum.coef$upper))
+  coord_cartesian(ylim = c(min(sum.coef$lower), max(sum.coef$upper)))
 
 plot_grid(Fig.5a, Fig.5b, labels = "AUTO")
 ggsave("./figures/Fig.5.png", height = 4, width = 9) 
