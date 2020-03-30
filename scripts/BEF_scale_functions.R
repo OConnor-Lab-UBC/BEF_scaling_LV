@@ -4,7 +4,7 @@ BEF_simulation <- function(type = "spatial", env_gamma = 2){
   #fixed parameters
   species <- 100
   sigma <- 0.25 #environmental niche breadth
-  r_max <- 5 #max growth rate
+  r_max <- 4 #max growth rate
   alpha <- matrix(runif(n = species*species, min = 0, max = 0.25), species, species) #per capita interspecific competition matrix
   diag(alpha) <- 1 #per capita intraspecific competition
   z <- seq(-0.2, 1.2, length = species) #environmental optima
