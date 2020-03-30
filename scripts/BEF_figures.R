@@ -94,7 +94,7 @@ ggsave("./figures/Fig.2.png", width = 10*1.2, height = 6*1.2)
 reps <- 100
 hold.raw.data <-data.frame()
 coef.df <- data.frame()
-for(r in 21:reps){
+for(r in 1:reps){
   for(gamma in c(0,1,2)){
     print(paste("rep = ",r,"; gamma = ", gamma, sep = ""))
     spatial_run <- BEF_simulation(type = "spatial", env_gamma = gamma)
