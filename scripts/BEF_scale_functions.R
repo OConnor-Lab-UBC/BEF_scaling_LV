@@ -1,10 +1,44 @@
 library(synchrony)
 
-BEF_simulation <- function(type = "spatial", env_gamma = 2){
+BEF_simulation <-  function(type = "spatial", env_gamma = 2, rep = 1){
+  set.seed(rep)
+  
+  max_scale <- 80
+  common_env <- phase.partnered(n = max_scale, gamma = env_gamma, mu = 0.5, sigma = 0.25)$timeseries[,1]
+  repeat{
+    burn_in_env <- phase.partnered(n = max_scale+1, gamma = env_gamma, mu = 0.5, sigma = 0.25)$timeseries[,1]
+    burn_in_env_stnd <- c(burn_in_env - (burn_in_env[max_scale+1] - common_env[1]))[-(max_scale+1)]
+
+    if(env_gamma == 0) {
+      temporal_env <- c(burn_in_env[-c(max_scale+1)],common_env)
+    }
+    if(max(burn_in_env_stnd) < 1.3 & min(burn_in_env_stnd) > - 0.3) {break}
+  }
+  temporal_env <- c(burn_in_env_stnd,common_env)
+  plot(temporal_env, type = "l")
+  abline(v = 80, lty = 2)
+  
+  if(type == "spatial"){
+    Tmax <- 150 #length of simulation
+    patches <- max_scale
+    #environment
+    env.df <- data.frame(env = common_env, patch = 1:patches)
+    #species responses to environmental variation
+  }
+  
+  if(type == "temporal"){
+    #Tmax <- (env_time+15)*2 #length of simulation
+    Tmax <- length(temporal_env)
+    patches <- 1
+    #environment
+    #env.df <- data.frame(env = c(rev(common_env),common_env), time = 1:Tmax)
+    env.df <- data.frame(env = temporal_env, time = 1:Tmax)
+  }
+  
   #fixed parameters
   species <- 100
   sigma <- 0.25 #environmental niche breadth
-  r_max <- 4 #max growth rate
+  r_max <- 5 #max growth rate
   alpha <- matrix(runif(n = species*species, min = 0, max = 0.25), species, species) #per capita interspecific competition matrix
   diag(alpha) <- 1 #per capita intraspecific competition
   z <- seq(-0.2, 1.2, length = species) #environmental optima
@@ -12,26 +46,8 @@ BEF_simulation <- function(type = "spatial", env_gamma = 2){
   reseed_value <- 0.035
   
   if(type == "spatial"){
-    Tmax <- 150 #length of simulation
-    patches <- 80
-    #environment
-    env.df<-data.frame(env = phase.partnered(n = patches, gamma = env_gamma, mu = 0.5, sigma = 0.25)$timeseries[,1], patch = 1:patches)
-    #species responses to environmental variation
-    r <- matrix(r_max*exp(-((rep(z, each = patches)-env.df$env)/(2*sigma))^2), patches, species)
-  }
-  
-  
-  if(type == "temporal"){
-    env_time <- 80
-    Tmax <- env_time*2 #length of simulation
-    patches <- 1
-    #environment
-    env.hold<-phase.partnered(n = env_time, gamma = env_gamma, mu = 0.5, sigma = 0.25)$timeseries[,1]
-    env.df <- data.frame(env = c(env.hold,rev(env.hold)), time = 1:Tmax)
-  }
-  
-  if(type == "spatial"){
     Nsave_all <- array(NA,dim=c(patches,species,species))
+    r <- matrix(r_max*exp(-((rep(z, each = patches)-env.df$env)/(2*sigma))^2), patches, species)
   }
   if(type == "temporal"){
     Nsave_all <- array(NA,dim=c(Tmax,species,species))
