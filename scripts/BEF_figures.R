@@ -34,6 +34,7 @@ Fig2a<- data.frame(N = c(sp_0[[1]][,,100]), species = rep(1:100, each = 80), pat
   scale_size_continuous(range = c(0.1,1),guide = F, breaks = c(0.05,1,1.4))+
   geom_line(data = data.frame(species = env_sp0, patch = 1:80), aes(size = NULL),color = "red", size = 0.5, alpha = 1)+
   ggtitle("gamma = 0")+
+  theme_classic()+
   ylim(0,100)
 
 Fig2b<- data.frame(N = c(sp_1[[1]][,,100]), species = rep(1:100, each = 80), patch = 1:80) %>%
@@ -44,6 +45,7 @@ Fig2b<- data.frame(N = c(sp_1[[1]][,,100]), species = rep(1:100, each = 80), pat
   scale_size_continuous(range = c(0.1,1),guide = F, breaks = c(0.05,1,1.4))+
   geom_line(data = data.frame(species = env_sp1, patch = 1:80), aes(size = NULL),color = "red", size = 0.5, alpha = 1)+
   ggtitle("gamma = 1")+
+  theme_classic()+
   ylim(0,100)
 
 Fig2c<- data.frame(N = c(sp_2[[1]][,,100]), species = rep(1:100, each = 80), patch = 1:80) %>%
@@ -54,6 +56,7 @@ Fig2c<- data.frame(N = c(sp_2[[1]][,,100]), species = rep(1:100, each = 80), pat
   scale_size_continuous(range = c(0.1,1),guide = F, breaks = c(0.05,1,1.4))+
   geom_line(data = data.frame(species = env_sp2, patch = 1:80), aes(size = NULL),color = "red", size = 0.5, alpha = 1)+
   ggtitle("gamma = 2")+
+  theme_classic()+
   ylim(0,100)
 
 Fig2d<- data.frame(N = c(tp_0[[1]][81:160,,100]), species = rep(1:100, each = 80), time = 1:80) %>%
@@ -64,6 +67,7 @@ Fig2d<- data.frame(N = c(tp_0[[1]][81:160,,100]), species = rep(1:100, each = 80
   scale_size_continuous(range = c(0.1,1),guide = F, breaks = c(0.05,1,1.4))+
   geom_line(data = data.frame(species = env_tp0, time = 1:80), aes(size = NULL),color = "red", size = 0.5, alpha = 1)+
   ggtitle("gamma = 0")+
+  theme_classic()+
   ylim(0,100)
 
 Fig2e<- data.frame(N = c(tp_1[[1]][81:160,,100]), species = rep(1:100, each = 80), time = 1:80) %>%
@@ -74,6 +78,7 @@ Fig2e<- data.frame(N = c(tp_1[[1]][81:160,,100]), species = rep(1:100, each = 80
   scale_size_continuous(range = c(0.1,1),guide = F, breaks = c(0.05,1,1.4))+
   geom_line(data = data.frame(species = env_tp1, time = 1:80), aes(size = NULL),color = "red", size = 0.5, alpha = 1)+
   ggtitle("gamma = 1")+
+  theme_classic()+
   ylim(0,100)
 
 Fig2f<- data.frame(N = c(tp_2[[1]][81:160,,100]), species = rep(1:100, each = 80), time = 1:80) %>%
@@ -84,11 +89,12 @@ Fig2f<- data.frame(N = c(tp_2[[1]][81:160,,100]), species = rep(1:100, each = 80
   scale_size_continuous(range = c(0.1,1),guide = F, breaks = c(0.05,1,1.4))+
   geom_line(data = data.frame(species = env_tp2, time = 1:80), aes(size = NULL),color = "red", size = 0.5, alpha = 1)+
   ggtitle("gamma = 2")+
+  theme_classic()+
   ylim(0,100)
 
 plot_grid(Fig2a, Fig2b, Fig2c, Fig2d, Fig2e, Fig2f, nrow = 2, labels = "AUTO")
 ggsave("./figures/Fig.2.png", width = 10*1.2, height = 6*1.2)
-
+ggsave("./figures/Fig.2.pdf", width = 10*1.2, height = 6*1.2)
 
 #run simulations####
 reps <- 100
