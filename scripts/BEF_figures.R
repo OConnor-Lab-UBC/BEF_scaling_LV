@@ -209,8 +209,9 @@ Fig.3d<- biomass.df %>%
   theme(legend.justification=c(1,0), legend.position=c(1,0.001))+
   coord_cartesian(ylim = c(min(biomass.df$lower), max(biomass.df$upper)))
 
-plot_grid(Fig.3a, Fig.3b, Fig.3c, Fig.3d,labels = "AUTO")
-ggsave("./figures/Fig.3.png", height = 8, width = 9) 
+plot_grid(Fig.3a, Fig.3b,labels = "AUTO")
+ggsave("./figures/Fig.3.png", height = 4, width = 9) 
+ggsave("./figures/Fig.3.pdf", height = 4, width = 9) 
 
 #Figure 4####
 sum.coef <- coef.df %>% 
@@ -341,6 +342,7 @@ Fig.4f <- hold.raw.data %>%
 
 plot_grid(Fig.4a, Fig.4b, Fig.4c, Fig.4d, Fig.4e, Fig.4f, labels = "AUTO",nrow = 2)
 ggsave("./figures/Fig.4.png", height = 10*0.7, width = 16*0.7)
+ggsave("./figures/Fig.4.pdf", height = 10*0.7, width = 16*0.7)
 
 #Figure 5####
 sum.coef <- coef.df %>% 
@@ -376,3 +378,4 @@ Fig.5b <- sum.coef %>%
 
 plot_grid(Fig.5a, Fig.5b, labels = "AUTO")
 ggsave("./figures/Fig.5.png", height = 4, width = 9) 
+ggsave("./figures/Fig.5.pdf", height = 4, width = 9) 
