@@ -1,9 +1,8 @@
 library(synchrony)
 
-BEF_simulation <-  function(type = "spatial", env_gamma = 2, rep = 1){
+BEF_simulation <-  function(type = "spatial", env_gamma = 2, rep = 1, r_max = 5, sigma = 0.25, alpha_max = 0.25, max_scale = 80, alpha_ii_sd = 0){
   set.seed(rep)
   
-  max_scale <- 80
   common_env <- phase.partnered(n = max_scale, gamma = env_gamma, mu = 0.5, sigma = 0.25)$timeseries[,1]
   repeat{
     burn_in_env <- phase.partnered(n = max_scale+1, gamma = env_gamma, mu = 0.5, sigma = 0.25)$timeseries[,1]
@@ -16,7 +15,7 @@ BEF_simulation <-  function(type = "spatial", env_gamma = 2, rep = 1){
   }
   temporal_env <- c(burn_in_env_stnd,common_env)
   plot(temporal_env, type = "l")
-  abline(v = 80, lty = 2)
+  abline(v = max_scale, lty = 2)
   
   if(type == "spatial"){
     Tmax <- 150 #length of simulation
@@ -37,10 +36,8 @@ BEF_simulation <-  function(type = "spatial", env_gamma = 2, rep = 1){
   
   #fixed parameters
   species <- 100
-  sigma <- 0.25 #environmental niche breadth
-  r_max <- 5 #max growth rate
-  alpha <- matrix(runif(n = species*species, min = 0, max = 0.25), species, species) #per capita interspecific competition matrix
-  diag(alpha) <- 1 #per capita intraspecific competition
+  alpha <- matrix(runif(n = species*species, min = 0, max = alpha_max), species, species) #per capita interspecific competition matrix
+  diag(alpha) <- rnorm(n = species, mean = 1, sd = alpha_ii_sd) #per capita intraspecific competition
   z <- seq(-0.2, 1.2, length = species) #environmental optima
   ext_thresh <- 0.05 #extinction threshold
   reseed_value <- 0.035
